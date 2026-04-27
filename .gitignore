@@ -1,0 +1,33 @@
+
+# Dataset — quá lớn, không commit
+data/
+ 
+# Model lớn (dùng Git LFS hoặc Google Drive nếu > 100MB)
+# models/*.pkl
+ 
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+ 
+# Jupyter checkpoints
+.ipynb_checkpoints/
+ 
+# Virtual environment
+venv/
+env/
+.env/
+ 
+# IDE
+.vscode/
+.idea/
+*.swp
+ 
+# OS
+.DS_Store
+Thumbs.db
+ 
+# Logs (optional — comment nếu muốn commit alerts.log)
+# outputs/alerts.log
