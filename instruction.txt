@@ -1,0 +1,310 @@
+
+# Người sau chạy:
+pip install -r requirements.txt
+
+File requirements.txt chỉ là danh sách để máy khác cài đúng môi trường. lúc đó Python sẽ cài toàn bộ thư viện.
+nghĩa là: pandas
+Dùng xử lý dữ liệu bảng (DataFrame), đọc CSV, lọc cột, merge file.
+Ví dụ:
+pd.read_csv(...)
+
+
+
+# Hướng dẫn thực hiện nhiệm vụ: EDA & Data Preprocessing cho CIC-IDS2017
+
+## 1. Mục tiêu công việc đã hoàn thành
+
+Nhiệm vụ này xử lý dữ liệu CIC-IDS2017 để chuẩn bị cho bước huấn luyện mô hình Machine Learning / Deep Learning.
+
+Các công việc đã thực hiện:
+
+* Tải dataset CIC-IDS2017 từ Kaggle
+* Load và merge 8 file CSV thành 1 DataFrame
+* Làm sạch dữ liệu
+* Xử lý missing values
+* Xóa duplicate rows
+* Chuẩn hóa dữ liệu số
+* Encode nhãn attack/benign
+* Phân tích dữ liệu (EDA)
+* Vẽ biểu đồ phân bố class
+* Vẽ correlation heatmap
+* Xuất dataset sạch
+
+---
+
+# 2. Yêu cầu môi trường
+
+## Cài đặt Python
+
+Khuyến nghị:
+
+* Python 3.10 trở lên
+
+Kiểm tra:
+
+```bash
+python --version
+```
+
+---
+
+# 3. Cài thư viện cần thiết
+
+Chạy lệnh:
+
+```bash
+pip install pandas numpy matplotlib seaborn scikit-learn kaggle jupyter
+```
+
+Nếu dùng Anaconda:
+
+```bash
+conda install pandas numpy matplotlib seaborn scikit-learn jupyter
+```
+
+---
+
+# 4. Tải dataset CIC-IDS2017
+
+## Cách 1: Từ Kaggle
+
+Dataset:
+
+CICIDS2017
+
+### Bước:
+
+1. Tạo tài khoản Kaggle
+2. Vào Account
+3. Create New API Token
+4. File `kaggle.json` sẽ tải về
+
+### Windows:
+
+Đặt file tại:
+
+```text
+C:\Users\<username>\.kaggle\kaggle.json
+```
+
+### Download dataset:
+
+```bash
+kaggle datasets download -d cicdataset/cicids2017
+```
+
+Giải nén file zip.
+
+---
+
+# 5. Cấu trúc thư mục project đề xuất
+
+```text
+project/
+│── data/
+│   ├── Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv
+│   ├── ...
+│── outputs/
+│── notebooks/
+│── preprocess.py
+│── README.md
+```
+
+---
+
+# 6. Code xử lý dữ liệu
+
+## Bước 1: Import thư viện
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+```
+
+---
+
+## Bước 2: Load toàn bộ CSV
+
+```python
+import os
+
+folder = "data"
+files = [f for f in os.listdir(folder) if f.endswith(".csv")]
+
+dfs = []
+for file in files:
+    path = os.path.join(folder, file)
+    df = pd.read_csv(path, low_memory=False)
+    dfs.append(df)
+
+data = pd.concat(dfs, ignore_index=True)
+```
+
+---
+
+## Bước 3: Làm sạch dữ liệu
+
+```python
+data.columns = data.columns.str.strip()
+
+data.replace([np.inf, -np.inf], np.nan, inplace=True)
+
+data.dropna(inplace=True)
+
+data.drop_duplicates(inplace=True)
+```
+
+---
+
+## Bước 4: Encode Label
+
+```python
+le = LabelEncoder()
+data["Label"] = le.fit_transform(data["Label"])
+```
+
+---
+
+## Bước 5: Chuẩn hóa feature
+
+```python
+X = data.drop("Label", axis=1)
+y = data["Label"]
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+X = pd.DataFrame(X_scaled, columns=X.columns)
+```
+
+---
+
+## Bước 6: Ghép lại dataset sạch
+
+```python
+cleaned = X.copy()
+cleaned["Label"] = y.values
+```
+
+---
+
+# 7. Vẽ biểu đồ
+
+## Phân bố attack
+
+```python
+plt.figure(figsize=(10,6))
+sns.countplot(x="Label", data=cleaned)
+plt.title("Attack Distribution")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig("outputs/attack_distribution.png")
+```
+
+---
+
+## Correlation heatmap
+
+```python
+plt.figure(figsize=(14,10))
+sns.heatmap(cleaned.corr(), cmap="coolwarm")
+plt.title("Correlation Heatmap")
+plt.tight_layout()
+plt.savefig("outputs/correlation_heatmap.png")
+```
+
+---
+
+# 8. Xuất file dữ liệu sạch
+
+```python
+cleaned.to_csv("outputs/cicids2017_cleaned.csv", index=False)
+```
+
+---
+
+# 9. Kết quả đầu ra
+
+Sau khi chạy xong sẽ có:
+
+```text
+outputs/
+├── attack_distribution.png
+├── correlation_heatmap.png
+└── cicids2017_cleaned.csv
+```
+
+---
+
+# 10. Người tiếp theo cần làm gì
+
+Người tiếp theo có thể dùng file:
+
+```text
+outputs/cicids2017_cleaned.csv
+```
+
+để làm:
+
+## Machine Learning
+
+* Random Forest
+* XGBoost
+* SVM
+* KNN
+
+## Deep Learning
+
+* ANN
+* CNN
+* LSTM
+
+## Ví dụ train/test split
+
+```python
+from sklearn.model_selection import train_test_split
+
+X = cleaned.drop("Label", axis=1)
+y = cleaned["Label"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+```
+
+---
+
+# 11. Gợi ý bước tiếp theo cho nhóm
+
+1. Feature Selection
+2. Train nhiều model
+3. So sánh Accuracy / Precision / Recall / F1-score
+4. Confusion Matrix
+5. Deploy demo web
+
+---
+
+# 12. Git commit đề xuất
+
+```bash
+git add .
+git commit -m "Complete EDA and preprocessing for CIC-IDS2017"
+git push
+```
+
+---
+
+# 13. Ghi chú
+
+Nếu dataset quá lớn, không nên push toàn bộ raw CSV lên GitHub. Chỉ nên push:
+
+* code
+* notebook
+* cleaned dataset (nếu nhẹ)
+* ảnh output
+* README
+
+---
