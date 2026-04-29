@@ -1,7 +1,7 @@
 
 # Dataset — quá lớn, không commit
 data/
- 
+outputs/*.csv
 # Model lớn (dùng Git LFS hoặc Google Drive nếu > 100MB)
 # models/*.pkl
  
