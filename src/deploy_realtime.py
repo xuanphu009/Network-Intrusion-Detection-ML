@@ -12,7 +12,11 @@ def detect_realtime(flow_data: dict, rf_model, scaler, le, dst_port: int = 80):
     """
     input_df     = pd.DataFrame([flow_data])
     input_scaled = scaler.transform(input_df)
-    pred_encoded = rf_model.predict(input_scaled)[0]
+    
+    # Convert numpy array back to DataFrame with feature names to avoid UserWarning
+    input_scaled_df = pd.DataFrame(input_scaled, columns=input_df.columns)
+    
+    pred_encoded = rf_model.predict(input_scaled_df)[0]
     pred_label   = le.inverse_transform([pred_encoded])[0]
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -31,7 +35,7 @@ def detect_realtime(flow_data: dict, rf_model, scaler, le, dst_port: int = 80):
 def run_simulation(X_test, selected_features, rf_model, scaler, le, n_samples=10):
     """Mô phỏng real-time với n mẫu từ test set"""
     os.makedirs('outputs', exist_ok=True)
-    print("\n🚀 Mô phỏng real-time detection:\n")
+    print("\nSimulation: Real-time detection:\n")
     for i in range(n_samples):
         sample   = dict(zip(selected_features, X_test[i]))
         port     = np.random.choice([22, 80, 443, 8080])

@@ -3,7 +3,7 @@
 data/
 outputs/*.csv
 # Model lớn (dùng Git LFS hoặc Google Drive nếu > 100MB)
-# models/*.pkl
+models/*.pkl
  
 # Python cache
 __pycache__/

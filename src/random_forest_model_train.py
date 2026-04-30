@@ -18,10 +18,10 @@ def train_random_forest(X_train_scaled, y_train_bal, X_test_scaled, y_test, le):
     
     rf_model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
     rf_model.fit(X_train_scaled, y_train_bal)
-    print(f"✅ Xong trong {time.time()-t0:.1f}s")
+    print(f"Done in {time.time()-t0:.1f}s")
     
     y_pred_rf = rf_model.predict(X_test_scaled)
-    print("\n📊 Classification Report — Random Forest:")
+    print("\nClassification Report - Random Forest:")
     print(classification_report(y_test, y_pred_rf, target_names=le.classes_))
     
     # Confusion Matrix
@@ -30,17 +30,17 @@ def train_random_forest(X_train_scaled, y_train_bal, X_test_scaled, y_test, le):
     sns.heatmap(confusion_matrix(y_test, y_pred_rf),
                 annot=True, fmt='d', cmap='Oranges',
                 xticklabels=le.classes_, yticklabels=le.classes_)
-    plt.title('Confusion Matrix — Random Forest ⭐ Best Model')
-    plt.ylabel('Thực tế'); plt.xlabel('Dự đoán')
+    plt.title('Confusion Matrix - Random Forest - Best Model')
+    plt.ylabel('Thuc te'); plt.xlabel('Du doan')
     plt.tight_layout()
     plt.savefig('outputs/confusion_matrix_rf.png', dpi=150)
     plt.show()
-    print("✅ Đã lưu: outputs/confusion_matrix_rf.png")
+    print("Da luu: outputs/confusion_matrix_rf.png")
     
-    # Lưu model ra .pkl
+    # Luu model ra .pkl
     os.makedirs('models', exist_ok=True)
     joblib.dump(rf_model, 'models/random_forest.pkl')
-    print("✅ Đã lưu: models/random_forest.pkl")
+    print("Da luu: models/random_forest.pkl")
     
     return rf_model, y_pred_rf
 
@@ -61,10 +61,10 @@ def build_comparison_table(y_test, y_pred_lr, y_pred_svm, y_pred_nb, y_pred_knn,
         })
     
     df_cmp = pd.DataFrame(rows).sort_values('F1-Score', ascending=False)
-    print("\n📊 Bảng so sánh 5 model:")
+    print("\nComparison Table - 5 Models:")
     print(df_cmp.to_string(index=False))
     
     os.makedirs('outputs', exist_ok=True)
     df_cmp.to_csv('outputs/model_comparison.csv', index=False)
-    print("✅ Đã lưu: outputs/model_comparison.csv")
+    print("Da luu: outputs/model_comparison.csv")
     return df_cmp
