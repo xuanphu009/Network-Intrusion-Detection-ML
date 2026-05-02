@@ -30,4 +30,4 @@ env/
 Thumbs.db
  
 # Logs (optional — comment nếu muốn commit alerts.log)
-# outputs/alerts.log
+# outputs/alerts.logoutputs/*.csv 
