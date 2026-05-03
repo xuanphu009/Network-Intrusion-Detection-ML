@@ -38,8 +38,8 @@ def train_svm(X_train, y_train, X_test, y_test, le):
     print("Training SVM (LinearSVC)...")
     t0 = time.time()
 
-    # LinearSVC nhanh hơn SVC kernel trên dataset lớn
-    svm_model = LinearSVC(max_iter=2000, random_state=42, C=1.0)
+    # dual=False phù hợp khi n_samples > n_features (tránh lỗi/cảnh báo trên dataset lớn)
+    svm_model = LinearSVC(max_iter=2000, random_state=42, C=1.0, dual=False)
     svm_model.fit(X_train, y_train)
     print(f"  Done in {time.time() - t0:.1f}s")
 

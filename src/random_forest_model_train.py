@@ -61,10 +61,41 @@ def build_comparison_table(y_test, y_pred_lr, y_pred_svm, y_pred_nb, y_pred_knn,
         })
     
     df_cmp = pd.DataFrame(rows).sort_values('F1-Score', ascending=False)
-    print("\nComparison Table - 5 Models:")
+    print("\n" + "*" * 30)
+    print("FINAL MODEL COMPARISON TABLE")
+    print("*" * 30)
     print(df_cmp.to_string(index=False))
     
     os.makedirs('outputs', exist_ok=True)
     df_cmp.to_csv('outputs/model_comparison.csv', index=False)
-    print("Da luu: outputs/model_comparison.csv")
+    print("\n[OK] Da luu: outputs/model_comparison.csv")
+    
+    # Ve bieu do so sanh
+    plot_comparison_chart(df_cmp)
+    
     return df_cmp
+
+def plot_comparison_chart(df_cmp):
+    """Vẽ biểu đồ cột so sánh các chỉ số giữa các model"""
+    plt.figure(figsize=(12, 7))
+    
+    # Chuyển dataframe sang dạng long-form để vẽ seaborn dễ hơn
+    df_plot = df_cmp.melt(id_vars='Model', var_name='Metric', value_name='Score')
+    
+    ax = sns.barplot(data=df_plot, x='Model', y='Score', hue='Metric', palette='viridis')
+    
+    # Thêm số liệu cụ thể lên đầu mỗi cột
+    for container in ax.containers:
+        ax.bar_label(container, fmt='%.3f', padding=3, fontsize=9)
+    
+    plt.title('Performance Comparison of 5 Models', fontsize=15, fontweight='bold')
+    plt.ylim(0, 1.2)
+    plt.ylabel('Score (0.0 - 1.0)')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    
+    save_path = 'outputs/model_comparison_chart.png'
+    plt.savefig(save_path, dpi=150)
+    plt.close()
+    print(f"[OK] Da luu bieu do so sanh: {save_path}")

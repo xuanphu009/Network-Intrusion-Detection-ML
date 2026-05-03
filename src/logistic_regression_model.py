@@ -1,4 +1,4 @@
-# src/logistic_regression_model.py
+ # src/logistic_regression_model.py
 # Train Logistic Regression: classification_report + Confusion Matrix + Nhận xét Recall
 
 import os
@@ -41,9 +41,7 @@ def train_logistic_regression(X_train, y_train, X_test, y_test, le):
     lr_model = LogisticRegression(
         max_iter=1000,
         solver="lbfgs",
-        multi_class="auto",
         random_state=42,
-        n_jobs=-1,
     )
     lr_model.fit(X_train, y_train)
     print(f"  Done in {time.time() - t0:.1f}s")
