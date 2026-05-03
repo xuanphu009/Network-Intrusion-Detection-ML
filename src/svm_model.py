@@ -1,0 +1,82 @@
+# src/svm_model.py
+# Train SVM (LinearSVC): classification_report + Confusion Matrix + Nhận xét Recall
+
+import os
+import time
+import joblib
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.svm import LinearSVC
+from sklearn.metrics import classification_report, confusion_matrix
+
+OUTPUT_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "../outputs"))
+MODELS_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "../models"))
+
+
+def _print_recall_comment(report_dict, class_names):
+    """Nhận xét Recall cho từng loại tấn công."""
+    print("\n  --- Nhan xet Recall theo tung loai tan cong (SVM - LinearSVC) ---")
+    for cls in class_names:
+        if cls not in report_dict:
+            continue
+        recall = report_dict[cls]["recall"]
+        support = report_dict[cls]["support"]
+        if recall >= 0.90:
+            level = "Rat tot"
+        elif recall >= 0.75:
+            level = "Kha tot"
+        elif recall >= 0.50:
+            level = "Trung binh"
+        else:
+            level = "Kem - can cai thien"
+        print(f"  [{cls}]  Recall = {recall:.4f}  ({level})  | Support = {support}")
+
+
+def train_svm(X_train, y_train, X_test, y_test, le):
+    print("=" * 60)
+    print("Training SVM (LinearSVC)...")
+    t0 = time.time()
+
+    # LinearSVC nhanh hơn SVC kernel trên dataset lớn
+    svm_model = LinearSVC(max_iter=2000, random_state=42, C=1.0)
+    svm_model.fit(X_train, y_train)
+    print(f"  Done in {time.time() - t0:.1f}s")
+
+    y_pred = svm_model.predict(X_test)
+
+    # Classification Report
+    print("\n  Classification Report - SVM (LinearSVC):")
+    report_str = classification_report(y_test, y_pred, target_names=le.classes_)
+    report_dict = classification_report(
+        y_test, y_pred, target_names=le.classes_, output_dict=True
+    )
+    print(report_str)
+
+    # Nhận xét Recall
+    _print_recall_comment(report_dict, le.classes_)
+
+    # Confusion Matrix
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    plt.figure(figsize=(12, 9))
+    sns.heatmap(
+        confusion_matrix(y_test, y_pred),
+        annot=True, fmt="d", cmap="Purples",
+        xticklabels=le.classes_, yticklabels=le.classes_,
+    )
+    plt.title("Confusion Matrix - SVM (LinearSVC)", fontsize=14, fontweight="bold")
+    plt.ylabel("Thuc te", fontsize=12)
+    plt.xlabel("Du doan", fontsize=12)
+    plt.xticks(rotation=45, ha="right")
+    plt.tight_layout()
+    save_path = os.path.join(OUTPUT_DIR, "confusion_matrix_svm.png")
+    plt.savefig(save_path, dpi=150)
+    plt.close()
+    print(f"  [OK] Da luu: {save_path}")
+
+    # Lưu model
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    joblib.dump(svm_model, os.path.join(MODELS_DIR, "svm_linearsvc.pkl"))
+    print("  [OK] Da luu: models/svm_linearsvc.pkl")
+
+    return svm_model, y_pred

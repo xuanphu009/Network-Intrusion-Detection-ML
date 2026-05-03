@@ -13,6 +13,9 @@ import numpy as np
 from preprocess import DATA_PATH, OUTPUT_DIR
 import knn_model
 import random_forest_model_train
+import logistic_regression_model
+import svm_model
+import naive_bayes_model
 import deploy_realtime
 
 # Cấu hình
@@ -105,7 +108,7 @@ def main():
         # y_pred_knn se bi thieu neu skip, khien so sanh bang bi loi local variable.
         # Nhung neu bo qua thi thuong da co bang so sanh roi.
 
-    # 5. Huấn luyện Random Forest & Deploy (Theo yêu cầu người dùng)
+    # 5. Huấn luyện Random Forest (Theo yêu cầu người dùng)
     rf_model_path = os.path.join(models_dir, "random_forest.pkl")
     if not os.path.exists(rf_model_path):
         print_header("Training Random Forest Model")
@@ -113,20 +116,41 @@ def main():
     else:
         print("[INFO] Da co models/random_forest.pkl, bo qua training Random Forest.")
         rf_obj = joblib.load(rf_model_path)
+        y_pred_rf = rf_obj.predict(X_test)
 
-    # 6. Tổng hợp bảng so sánh 5 model (Yêu cầu Phần 2.5)
-    # Buoc nay can y_pred_knn va y_pred_rf. 
-    # Neu bo qua training thi can mock hoac load pred. De don gian, chi chay neu co ca 2.
-    if 'y_pred_knn' in locals() and 'y_pred_rf' in locals():
-        print_header("Model Comparison Table")
-        print("[INFO] Dang tong hop ket qua tu Nguoi 3 (Placeholder)...")
-        y_pred_lr = y_pred_knn 
-        y_pred_svm = y_pred_rf 
-        y_pred_nb = y_pred_knn 
-        
-        random_forest_model_train.build_comparison_table(
-            y_test, y_pred_lr, y_pred_svm, y_pred_nb, y_pred_knn, y_pred_rf
-        )
+    # 6. Huấn luyện Logistic Regression, SVM, Naive Bayes (Người 3)
+    print_header("Training Logistic Regression")
+    lr_path = os.path.join(models_dir, "logistic_regression.pkl")
+    if not os.path.exists(lr_path):
+        _, y_pred_lr = logistic_regression_model.train_logistic_regression(X_train, y_train, X_test, y_test, le)
+    else:
+        print("[INFO] Da co models/logistic_regression.pkl, dang load va predict...")
+        lr_obj = joblib.load(lr_path)
+        y_pred_lr = lr_obj.predict(X_test)
+
+    print_header("Training SVM (LinearSVC)")
+    svm_path = os.path.join(models_dir, "svm_linearsvc.pkl")
+    if not os.path.exists(svm_path):
+        _, y_pred_svm = svm_model.train_svm(X_train, y_train, X_test, y_test, le)
+    else:
+        print("[INFO] Da co models/svm_linearsvc.pkl, dang load va predict...")
+        svm_obj = joblib.load(svm_path)
+        y_pred_svm = svm_obj.predict(X_test)
+
+    print_header("Training Naive Bayes")
+    nb_path = os.path.join(models_dir, "naive_bayes.pkl")
+    if not os.path.exists(nb_path):
+        _, y_pred_nb = naive_bayes_model.train_naive_bayes(X_train, y_train, X_test, y_test, le)
+    else:
+        print("[INFO] Da co models/naive_bayes.pkl, dang load va predict...")
+        nb_obj = joblib.load(nb_path)
+        y_pred_nb = nb_obj.predict(X_test)
+
+    # 7. Tổng hợp bảng so sánh 5 model
+    print_header("Model Comparison Table")
+    random_forest_model_train.build_comparison_table(
+        y_test, y_pred_lr, y_pred_svm, y_pred_nb, y_pred_knn if 'y_pred_knn' in locals() else y_pred_lr, y_pred_rf
+    )
 
     # 7. Real-time Deployment Simulation
     print_header("Real-time Deployment Simulation")
