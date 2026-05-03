@@ -4,3 +4,9 @@ models/*.pkl
 outputs/*.csv
 !outputs/model_comparison.csv
 pipeline.log
+
+# IDE and Environment
+.vscode/
+**/__pycache__/
+venv/
+.env
