@@ -19,7 +19,7 @@ import naive_bayes_model
 import deploy_realtime
 
 # Cấu hình
-FAST_MODE = True  # Chuyển thành False nếu muốn chạy trên toàn bộ dữ liệu test (sẽ chậm)
+FAST_MODE = False  # Chuyển thành False nếu muốn chạy trên toàn bộ dữ liệu test (sẽ chậm)
 
 def print_header(text):
     print("\n" + "=" * 60)
