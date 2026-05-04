@@ -69,7 +69,7 @@ Sau khi chạy, hệ thống sẽ:
 
 ## 👥 Thành viên thực hiện
 - Dự án được thực hiện cho môn học **An toàn Bảo mật Mạng**.
-- Nhóm phát triển: [Tên thành viên/Nhóm của bạn]
+- Nhóm phát triển: [Nhóm 13]
 
 ---
 *Dự án này được phát triển với mục đích học tập và nghiên cứu về ứng dụng AI trong an ninh mạng.*
