@@ -8,7 +8,7 @@ import os
 
 def detect_realtime(flow_data: dict, rf_model, scaler, le, dst_port: int = 80):
     """
-    Nhận 1 luồng mạng (dict gồm 18 features), phân loại & sinh alert.
+    Nhận 1 luồng mạng (dict gồm 17 features), phân loại & sinh alert.
     """
     input_df     = pd.DataFrame([flow_data])
     input_scaled = scaler.transform(input_df)

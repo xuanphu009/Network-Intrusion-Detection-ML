@@ -58,7 +58,7 @@ def run_balancing():
     y = df["Label"]
 
     # ==========================================================
-    # 5. FEATURE SELECTION — 18 FEATURES (yêu cầu 2.4)
+    # 5. FEATURE SELECTION — 17 FEATURES (yêu cầu 2.4)
     # Làm trước Scale để nhẹ hơn
     # ==========================================================
 
